@@ -25,4 +25,12 @@
 
   <artifactId>vietnam4j-war</artifactId>
   <packaging>war</packaging>
+
+  <dependencies>
+    <dependency>
+      <groupId>${project.groupId}</groupId>
+      <artifactId>vietnam4j-core</artifactId>
+      <version>${project.version}</version>
+    </dependency>
+  </dependencies>
 </project>

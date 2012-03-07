@@ -1,3 +1,5 @@
+package com.cloudbees.vietnam4j;
+
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.LocalConnector;
 import org.mortbay.jetty.Server;
