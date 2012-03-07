@@ -19,10 +19,17 @@ public class ProxyServlet extends HttpServlet {
         webApp.handleRequest(req, resp);
     }
 
-    private synchronized ProxiedWebApplication getProxyWebApplication() {
-        if (webApp==null)
+    private synchronized ProxiedWebApplication getProxyWebApplication() throws ServletException {
+        if (webApp==null) {
+            System.setProperty("JENKINS_HOME","/tmp/throwaway");
             webApp = new ProxiedWebApplication(new File("/home/kohsuke/ws/jenkins/jenkins/war/target/jenkins"),
                     getServletContext().getContextPath());
-        return null;
+            try {
+                webApp.start();
+            } catch (Exception e) {
+                throw new ServletException(e);
+            }
+        }
+        return webApp;
     }
 }
