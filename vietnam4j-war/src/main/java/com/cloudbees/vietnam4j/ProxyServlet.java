@@ -6,6 +6,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  * @author Kohsuke Kawaguchi
@@ -17,6 +19,15 @@ public class ProxyServlet extends HttpServlet {
     protected void service(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
         ProxiedWebApplication webApp = getProxyWebApplication();
         webApp.handleRequest(req, resp);
+    }
+
+    @Override
+    public void destroy() {
+        try {
+            webApp.stop();
+        } catch (Exception e) {
+            LOGGER.log(Level.WARNING, "Failed to shutdown "+webApp,e);
+        }
     }
 
     private synchronized ProxiedWebApplication getProxyWebApplication() throws ServletException {
@@ -32,4 +43,6 @@ public class ProxyServlet extends HttpServlet {
         }
         return webApp;
     }
+
+    private static final Logger LOGGER = Logger.getLogger(ProxyServlet.class.getName());
 }
