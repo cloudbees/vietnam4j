@@ -44,13 +44,11 @@
     </license>
   </licenses>
 
-  <!--
   <scm>
-    <connection>scm:git:git://github.com/cloudbees/cloudbees-api-client.git</connection>
-    <developerConnection>scm:git:git@github.com:cloudbees/cloudbees-api-client.git</developerConnection>
-    <url>http://github.com/cloudbees/cloudbees-api-client/tree/master/</url>
+    <connection>scm:git:git://github.com/cloudbees/vietnam4j.git</connection>
+    <developerConnection>scm:git:git@github.com:cloudbees/vietnam4j.git</developerConnection>
+    <url>http://github.com/cloudbees/vietnam4j/tree/master/</url>
   </scm>
-  -->
 
   <build>
     <pluginManagement>
