@@ -25,14 +25,14 @@
 
   <artifactId>vietnam4j-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.0-SNAPSHOT</version>
+  <version>1.0</version>
   <modules>
     <module>vietnam4j-core</module>
     <module>vietnam4j-war</module>
   </modules>
 
-  <name></name>
-  <description></description>
+  <name />
+  <description />
   <url>https://github.com/cloudbees/vietnam4j</url>
   <inceptionYear>2012</inceptionYear>
 
