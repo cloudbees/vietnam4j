@@ -32,9 +32,12 @@ import static org.mortbay.jetty.Handler.*;
  */
 public class Foo {
     public static void main(String[] args) throws Exception {
+        if (args.length != 1) {
+            throw new IllegalStateException("Usage: … /path/to/jenkins/war/target/jenkins");
+        }
         final Server server = new Server();
         System.setProperty("JENKINS_HOME","/tmp/throwaway");
-        WebAppContext webApp = new WebAppContext("/home/kohsuke/ws/jenkins/jenkins/war/target/jenkins","/");
+        WebAppContext webApp = new WebAppContext(args[0],"/");
         server.setHandler(webApp);
         server.start();
 //        webApp.setServletHandler(new MyServletHandler());
@@ -56,6 +59,7 @@ public class Foo {
         when(request.getMethod()).thenReturn("GET");
         when(request.getRequestURI()).thenReturn("/");
         when(request.getContextPath()).thenReturn("");
+        when(request.getServletPath()).thenReturn("/");
         when(request.getAttributeNames()).thenReturn(new Vector().elements());
         when(response.getOutputStream()).thenReturn(new MyServletOutputStream());
 
