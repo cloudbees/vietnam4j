@@ -87,10 +87,13 @@ public class ProxiedWebApplication {
             }
         };
 
+        ClassLoader oldCCL = Thread.currentThread().getContextClassLoader();
+        Thread.currentThread().setContextClassLoader(webApp.getClassLoader());
         try {
             webApp.getServletHandler().handle("/", request, response, REQUEST);
         } finally {
             hc.set(old);
+            Thread.currentThread().setContextClassLoader(oldCCL);
         }
     }
 
