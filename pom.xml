@@ -48,12 +48,14 @@
     <url>http://github.com/cloudbees/vietnam4j/tree/master/</url>
   </scm>
 
+  <!-- XXX does not work: https://github.com/khuxtable/wagon-gitsite/issues/10
   <distributionManagement>
     <site>
       <id>github-pages</id>
       <url>gitsite:git@github.com/cloudbees/vietnam4j.git</url>
     </site>
   </distributionManagement>
+  -->
 
   <build>
     <pluginManagement>
