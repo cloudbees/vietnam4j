@@ -74,6 +74,14 @@ public class ProxiedWebApplication {
     }
 
     /**
+     * Gets the servlet context of the proxied web app, after {@link #start} has been called.
+     * @since 1.2
+     */
+    public ServletContext getProxiedServletContext() {
+        return webApp.getServletContext();
+    }
+
+    /**
      * Dispatches a request.
      */
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
@@ -83,7 +91,7 @@ public class ProxiedWebApplication {
 
         request = new HttpServletRequestWrapper(request) {
             public ServletContext getServletContext() {
-                return webApp.getServletContext();
+                return getProxiedServletContext();
             }
         };
 
