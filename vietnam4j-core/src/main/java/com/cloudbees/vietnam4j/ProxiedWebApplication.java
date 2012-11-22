@@ -26,6 +26,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
@@ -187,6 +188,21 @@ public class ProxiedWebApplication {
             Thread.currentThread().setContextClassLoader(oldCCL);
         }
     }
+
+    /**
+     * Gets the {@link HttpSession} used by the proxied web application.
+     *
+     * @param base
+     *      The outer session. The session used by the proxied web application is scoped by this session.
+     */
+    public HttpSession getProxiedSession(HttpSession base) {
+        String id = ProxiedSession.class.getName()+getContextPath();
+        HttpSession nested = (HttpSession)base.getAttribute(id);
+        if (nested==null)
+            base.setAttribute(id,nested=new ProxiedSession(this,base));
+        return nested;
+    }
+
 
     /**
      * A hack to work around the restrictive access of {@link HttpConnection#setCurrentConnection(HttpConnection)}

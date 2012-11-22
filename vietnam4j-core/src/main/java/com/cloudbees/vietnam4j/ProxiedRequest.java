@@ -109,10 +109,6 @@ class ProxiedRequest extends HttpServletRequestWrapper {
         HttpSession base = super.getSession(create);
         if (base==null)     return null;
 
-        String id = ProxiedSession.class.getName()+webApp.getContextPath();
-        HttpSession nested = (HttpSession)base.getAttribute(id);
-        if (nested==null)
-            base.setAttribute(id,nested=new ProxiedSession(webApp,base));
-        return nested;
+        return webApp.getProxiedSession(base);
     }
 }
