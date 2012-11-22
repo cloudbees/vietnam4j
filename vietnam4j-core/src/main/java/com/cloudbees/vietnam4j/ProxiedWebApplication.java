@@ -87,6 +87,17 @@ public class ProxiedWebApplication {
     }
 
     /**
+     * Returns the classloader that sees all the classes in the proxied webapp.
+     *
+     * Can be called only after the {@link #start()} method
+     */
+    public ClassLoader getWebAppClassLoader() {
+        if (!webApp.isStarted())
+            throw new IllegalStateException();
+        return webApp.getClassLoader();
+    }
+
+    /**
      * Starts the proxied web application.
      */
     public void start() throws Exception {
