@@ -49,4 +49,33 @@
       <scope>test</scope>
     </dependency>
   </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.apache.maven.plugins</groupId>
+        <artifactId>maven-shade-plugin</artifactId>
+        <version>2.0</version>
+        <executions>
+          <execution>
+            <phase>package</phase>
+            <goals>
+              <goal>shade</goal>
+            </goals>
+            <configuration>
+              <!-- have the shaded jar replace the main manifest, with reduced POM that doesn't have jetty as a dependency -->
+              <shadedArtifactAttached>false</shadedArtifactAttached>
+              <createDependencyReducedPom>true</createDependencyReducedPom>
+              <relocations>
+                <relocation>
+                  <pattern>org.mortbay</pattern>
+                  <shadedPattern>com.cloudbees.vietnam4j.mortbay</shadedPattern>
+                </relocation>
+              </relocations>
+            </configuration>
+          </execution>
+        </executions>
+      </plugin>
+    </plugins>
+  </build>
 </project>
