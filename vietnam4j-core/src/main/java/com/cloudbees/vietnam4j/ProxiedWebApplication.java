@@ -29,6 +29,7 @@ import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
+import java.net.URL;
 
 import static org.mortbay.jetty.Handler.*;
 
@@ -38,7 +39,7 @@ import static org.mortbay.jetty.Handler.*;
  * @author Kohsuke Kawaguchi
  */
 public class ProxiedWebApplication {
-    private final File war;
+    private final String war;
     private final String contextPath;
     private Server server;
     private WebAppContext webApp;
@@ -55,7 +56,12 @@ public class ProxiedWebApplication {
      *      {@linkplain ServletContext#getContextPath() context path} of the deployed web application.
      */
     public ProxiedWebApplication(File war, String contextPath) {
-        this.war = war;
+        this.war = war.getPath();
+        this.contextPath = contextPath;
+    }
+
+    public ProxiedWebApplication(URL war, String contextPath) {
+        this.war = war.toExternalForm();
         this.contextPath = contextPath;
     }
 
@@ -85,7 +91,7 @@ public class ProxiedWebApplication {
      */
     public void start() throws Exception {
         server = new Server();
-        webApp = new WebAppContext(war.getPath(),contextPath);
+        webApp = new WebAppContext(war,contextPath);
         if (parentClassLoader!=null)
             webApp.setClassLoader(new WebAppClassLoader(parentClassLoader,webApp));
 
