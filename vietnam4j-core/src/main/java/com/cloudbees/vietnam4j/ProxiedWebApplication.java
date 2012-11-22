@@ -18,6 +18,7 @@ package com.cloudbees.vietnam4j;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.LocalConnector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.handler.ContextHandler;
 import org.mortbay.jetty.webapp.WebAppClassLoader;
 import org.mortbay.jetty.webapp.WebAppContext;
 
@@ -28,6 +29,7 @@ import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
+import java.lang.reflect.Field;
 
 import static org.mortbay.jetty.Handler.*;
 
@@ -41,6 +43,7 @@ public class ProxiedWebApplication {
     private final String contextPath;
     private Server server;
     private WebAppContext webApp;
+    private Object requestListeners;    // came from webApp._requestListeners
 
     private ClassLoader parentClassLoader;
 
@@ -82,8 +85,21 @@ public class ProxiedWebApplication {
         webApp = new WebAppContext(war.getPath(),contextPath);
         if (parentClassLoader!=null)
             webApp.setClassLoader(new WebAppClassLoader(parentClassLoader,webApp));
+
+        try {
+            Class.forName("com.cloudbees.vietnam4j.mortbay.jetty.webapp.WebAppContext");
+            webApp.setDefaultsDescriptor("com/cloudbees/vietnam4j/webdefault.xml");
+        } catch (ClassNotFoundException e) {
+            // package not renamed, proceed without custom default XML
+        }
+
         server.setHandler(webApp);
         server.start();
+
+        // pry in and grab request listeners
+        Field f = ContextHandler.class.getDeclaredField("_requestListeners");
+        f.setAccessible(true);
+        requestListeners = f.get(webApp);
     }
 
     /**
@@ -110,6 +126,7 @@ public class ProxiedWebApplication {
         // needed to fake Jetty
         HttpConnection2 hc = new HttpConnection2();
         HttpConnection old = hc.set(hc);
+        hc.getRequest().setRequestListeners(requestListeners);
 
         request = new HttpServletRequestWrapper(request) {
             public ServletContext getServletContext() {
