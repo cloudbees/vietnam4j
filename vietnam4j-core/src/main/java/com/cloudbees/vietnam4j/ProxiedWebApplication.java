@@ -18,6 +18,7 @@ package com.cloudbees.vietnam4j;
 import org.mortbay.jetty.HttpConnection;
 import org.mortbay.jetty.LocalConnector;
 import org.mortbay.jetty.Server;
+import org.mortbay.jetty.webapp.WebAppClassLoader;
 import org.mortbay.jetty.webapp.WebAppContext;
 
 import javax.servlet.ServletContext;
@@ -41,6 +42,8 @@ public class ProxiedWebApplication {
     private Server server;
     private WebAppContext webApp;
 
+    private ClassLoader parentClassLoader;
+
     /**
      * Creates a proxied web application.
      * 
@@ -54,12 +57,31 @@ public class ProxiedWebApplication {
         this.contextPath = contextPath;
     }
 
+    public ClassLoader getParentClassLoader() {
+        return parentClassLoader;
+    }
+
+    /**
+     * If set, web application will see this classloader as the parent classloader.
+     * This needs to be able to see the same servlet API that vietnam4j itself uses,
+     * but often masking other classes is useful to isolate the proxied webapp to
+     * interfere with the caller's classes.
+     *
+     * The common idiom when used inside a servlet container is to pass in
+     * {@code HttpServletRequest.class.getClassLoader()}.
+     */
+    public void setParentClassLoader(ClassLoader parentClassLoader) {
+        this.parentClassLoader = parentClassLoader;
+    }
+
     /**
      * Starts the proxied web application.
      */
     public void start() throws Exception {
         server = new Server();
         webApp = new WebAppContext(war.getPath(),contextPath);
+        if (parentClassLoader!=null)
+            webApp.setClassLoader(new WebAppClassLoader(parentClassLoader,webApp));
         server.setHandler(webApp);
         server.start();
     }
