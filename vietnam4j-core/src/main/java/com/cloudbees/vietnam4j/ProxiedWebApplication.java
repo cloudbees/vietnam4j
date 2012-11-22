@@ -30,6 +30,8 @@ import java.io.File;
 import java.io.IOException;
 import java.lang.reflect.Field;
 import java.net.URL;
+import java.util.ArrayList;
+import java.util.List;
 
 import static org.mortbay.jetty.Handler.*;
 
@@ -46,6 +48,12 @@ public class ProxiedWebApplication {
     private Object requestListeners;    // came from webApp._requestListeners
 
     private ClassLoader parentClassLoader;
+
+    /**
+     * Calls to {@link #addClassPath(File)} prior to {@link #start()}
+     */
+    private List<String> classPaths = new ArrayList<String>();
+
 
     /**
      * Creates a proxied web application.
@@ -92,9 +100,25 @@ public class ProxiedWebApplication {
      * Can be called only after the {@link #start()} method
      */
     public ClassLoader getWebAppClassLoader() {
-        if (!webApp.isStarted())
+        if (webApp==null)
             throw new IllegalStateException();
         return webApp.getClassLoader();
+    }
+
+    /**
+     * Call this method before {@link #start()}, and you set additional classpath for the webapp classloader.
+     * These classpath elements are inserted before the contents of the war file.
+     *
+     * This lets you override some of what's in the war file with your own classpath elements.
+     */
+    public void addClassPath(URL url) throws IOException {
+        if (webApp!=null)
+            throw new IllegalStateException();
+        classPaths.add(url.toExternalForm());
+    }
+
+    public void addClassPath(File f) throws IOException {
+        addClassPath(f.toURI().toURL());
     }
 
     /**
@@ -103,8 +127,12 @@ public class ProxiedWebApplication {
     public void start() throws Exception {
         server = new Server();
         webApp = new WebAppContext(war,contextPath);
-        if (parentClassLoader!=null)
-            webApp.setClassLoader(new WebAppClassLoader(parentClassLoader,webApp));
+
+        WebAppClassLoader cl = new WebAppClassLoader(parentClassLoader, webApp);
+        for (String path : classPaths)
+            cl.addClassPath(path);
+        classPaths.clear();
+        webApp.setClassLoader(cl);
 
         try {
             Class.forName("com.cloudbees.vietnam4j.mortbay.jetty.webapp.WebAppContext");
