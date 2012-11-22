@@ -108,7 +108,7 @@ public class ProxiedWebApplication {
 
         try {
             Class.forName("com.cloudbees.vietnam4j.mortbay.jetty.webapp.WebAppContext");
-            webApp.setDefaultsDescriptor(getClass().getResource("webdefault.xml").toExternalForm());
+            webApp.setDefaultsDescriptor(ProxiedWebApplication.class.getResource("webdefault.xml").toExternalForm());
         } catch (ClassNotFoundException e) {
             // package not renamed, proceed without custom default XML
         }
