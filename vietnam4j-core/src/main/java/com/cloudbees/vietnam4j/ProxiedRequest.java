@@ -7,6 +7,7 @@ import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletRequestWrapper;
+import javax.servlet.http.HttpSession;
 import java.util.Enumeration;
 
 /**
@@ -98,5 +99,20 @@ class ProxiedRequest extends HttpServletRequestWrapper {
         return req.getRealPath(path);
     }
 
-    // TODO: session should be isolated from the main session
+    @Override
+    public HttpSession getSession() {
+        return getSession(true);
+    }
+
+    @Override
+    public HttpSession getSession(boolean create) {
+        HttpSession base = super.getSession(create);
+        if (base==null)     return null;
+
+        String id = ProxiedSession.class.getName()+webApp.getContextPath();
+        HttpSession nested = (HttpSession)base.getAttribute(id);
+        if (nested==null)
+            base.setAttribute(id,nested=new ProxiedSession(webApp,base));
+        return nested;
+    }
 }
