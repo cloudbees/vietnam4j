@@ -25,7 +25,6 @@ import org.mortbay.jetty.webapp.WebAppContext;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletRequestWrapper;
 import javax.servlet.http.HttpServletResponse;
 import java.io.File;
 import java.io.IOException;
@@ -58,6 +57,10 @@ public class ProxiedWebApplication {
     public ProxiedWebApplication(File war, String contextPath) {
         this.war = war;
         this.contextPath = contextPath;
+    }
+
+    public String getContextPath() {
+        return contextPath;
     }
 
     public ClassLoader getParentClassLoader() {
@@ -124,20 +127,16 @@ public class ProxiedWebApplication {
      */
     public void handleRequest(HttpServletRequest request, HttpServletResponse response) throws IOException, ServletException {
         // needed to fake Jetty
-        HttpConnection2 hc = new HttpConnection2();
+        final HttpConnection2 hc = new HttpConnection2();
         HttpConnection old = hc.set(hc);
         hc.getRequest().setRequestListeners(requestListeners);
 
-        request = new HttpServletRequestWrapper(request) {
-            public ServletContext getServletContext() {
-                return getProxiedServletContext();
-            }
-        };
+        request = new ProxiedRequest(this, request, hc);
 
         ClassLoader oldCCL = Thread.currentThread().getContextClassLoader();
         Thread.currentThread().setContextClassLoader(webApp.getClassLoader());
         try {
-            webApp.getServletHandler().handle("/", request, response, REQUEST);
+            webApp.getServletHandler().handle(request.getRequestURI().substring(contextPath.length()), request, response, REQUEST);
         } finally {
             hc.set(old);
             Thread.currentThread().setContextClassLoader(oldCCL);
@@ -164,4 +163,5 @@ public class ProxiedWebApplication {
     public String toString() {
         return super.toString()+"["+war+"]";
     }
+
 }
