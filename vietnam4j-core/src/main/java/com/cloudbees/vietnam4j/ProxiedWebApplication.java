@@ -45,7 +45,7 @@ public class ProxiedWebApplication {
     private final String war;
     private final String contextPath;
     private Server server;
-    private WebAppContext webApp;
+    private final WebAppContext webApp;
     private Object requestListeners;    // came from webApp._requestListeners
 
     private ClassLoader parentClassLoader;
@@ -67,11 +67,13 @@ public class ProxiedWebApplication {
     public ProxiedWebApplication(File war, String contextPath) {
         this.war = war.getPath();
         this.contextPath = contextPath;
+        webApp = new WebAppContext(this.war,contextPath);
     }
 
     public ProxiedWebApplication(URL war, String contextPath) {
         this.war = war.toExternalForm();
         this.contextPath = contextPath;
+        webApp = new WebAppContext(this.war,contextPath);
     }
 
     public String getContextPath() {
@@ -101,7 +103,7 @@ public class ProxiedWebApplication {
      * Can be called only after the {@link #start()} method
      */
     public ClassLoader getWebAppClassLoader() {
-        if (webApp==null)
+        if (!webApp.isStarted())
             throw new IllegalStateException();
         return webApp.getClassLoader();
     }
@@ -113,7 +115,7 @@ public class ProxiedWebApplication {
      * This lets you override some of what's in the war file with your own classpath elements.
      */
     public void addClassPath(URL url) throws IOException {
-        if (webApp!=null)
+        if (webApp.isStarted())
             throw new IllegalStateException();
         classPaths.add(url.toExternalForm());
     }
@@ -127,7 +129,6 @@ public class ProxiedWebApplication {
      */
     public void start() throws Exception {
         server = new Server();
-        webApp = new WebAppContext(war,contextPath);
 
         WebAppClassLoader cl = new WebAppClassLoader(parentClassLoader, webApp);
         for (String path : classPaths)
