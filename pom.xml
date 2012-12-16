@@ -25,7 +25,7 @@
 
   <artifactId>vietnam4j-parent</artifactId>
   <packaging>pom</packaging>
-  <version>1.6-SNAPSHOT</version>
+  <version>1.6</version>
   <modules>
     <module>vietnam4j-core</module>
     <module>vietnam4j-war</module>
