@@ -109,6 +109,16 @@ public class ProxiedWebApplication {
     }
 
     /**
+     * If set to true, the webapp classloader will delegate to the parent first before attempting
+     * to resolve the class by itself.
+     *
+     * The default is false, which is what the servlet spec specifies.
+     */
+    public void setParentLoaderHasPriority(boolean v) {
+        webApp.setParentLoaderPriority(v);
+    }
+
+    /**
      * Call this method before {@link #start()}, and you set additional classpath for the webapp classloader.
      * These classpath elements are inserted before the contents of the war file.
      *
