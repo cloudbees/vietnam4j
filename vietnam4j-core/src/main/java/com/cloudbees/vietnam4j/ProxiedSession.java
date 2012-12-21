@@ -69,7 +69,7 @@ class ProxiedSession implements HttpSession {
     }
 
     public void invalidate() {
-        base.invalidate();
+        webApp.invalidateProxiedSession(this,base);
     }
 
     public boolean isNew() {

@@ -214,6 +214,34 @@ public class ProxiedWebApplication {
         return nested;
     }
 
+    /**
+     * Clears the nested {@link HttpSession} object used by the proxied web application.
+     *
+     * @param base
+     *      The outer session. The session used by the proxied web application is scoped by this session.
+     */
+    public void clearProxiedSession(HttpSession base) {
+        String id = ProxiedSession.class.getName()+getContextPath();
+        base.removeAttribute(id);
+    }
+
+    /**
+     * Invalidates the session of a proxied web application.
+     *
+     * By default, this code does {@base base.invalidate()} which makes the outer webapp and the proxied webapp
+     * to share the same life span for sessions. But this method can be overridden to change this behavior
+     * (for example by instead calling {@code clearProxiedSession(base)}.
+     *
+     * @param proxied
+     *      The session object in the proxied web application.
+     * @param base
+     *      The outer session object (see the 'base' parameter of the {@link #getProxiedSession(HttpSession)})
+     *      from which the 'proxied' parameter is derived.
+     */
+    public void invalidateProxiedSession(HttpSession proxied, HttpSession base) {
+        base.invalidate();
+    }
+
 
     /**
      * A hack to work around the restrictive access of {@link HttpConnection#setCurrentConnection(HttpConnection)}
